@@ -36,7 +36,7 @@ export default function PosterGrid({ posters }) {
             className="group"
           >
             <Link to={`/poster/${poster.id}`}>
-              <div className="aspect-[3/4] overflow-hidden bg-gray-100 rounded-lg">
+              <div className="aspect-[3/4] overflow-hidden bg-gray-100 rounded-none">
                 <img
                   src={poster.image}
                   alt={poster.title}

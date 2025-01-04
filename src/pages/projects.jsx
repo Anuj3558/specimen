@@ -2,9 +2,9 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useMediaQuery } from 'react-responsive';
-import Footer from './Footer'; // Import the Footer component
+import { motion, AnimatePresence } from 'framer-motion'; // Import framer-motion
 
-const Home = () => {
+const Project = () => {
   const [scrollPosition, setScrollPosition] = useState(400); // Initialize to 400 for the 5th image
   const [activeIndex, setActiveIndex] = useState(4); // Initialize to 4 for the 5th image
   const containerRef = useRef(null);
@@ -12,6 +12,13 @@ const Home = () => {
   const isMobile = useMediaQuery({ query: '(max-width: 768px)' });
 
   const images = Array(11).fill("/placeholder.svg?height=1000&width=800");
+  const sideNavItems = [
+    "THE CAR SERIES_23",
+    "MOVIE SERIES",
+    "RAP ARTISTS",
+    "DLX EDITIONS",
+    "NEW IN"
+  ];
 
   // Create audio context and sounds on component mount
   useEffect(() => {
@@ -100,8 +107,26 @@ const Home = () => {
   };
 
   return (
-    <div className="relative min-h-screen bg-gray-100 mx-auto overflow-hidden">
+    <motion.div
+      initial={{ opacity: 0 }} // Initial state (hidden)
+      animate={{ opacity: 1 }} // Animate to fully visible
+      transition={{ duration: 1, ease: 'easeInOut' }} // Smooth transition
+      className="relative min-h-screen bg-gray-100 mx-auto overflow-hidden"
+    >
       {/* Main Content */}
+      <div className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 z-40">
+        {sideNavItems.map((item, index) => (
+          <div
+            key={index}
+            className={`text-xs md:text-sm ${activeIndex === index ? 'text-gray-900 font-medium' : 'text-gray-600'} 
+                       mb-2 md:mb-4 transition-colors duration-300`}
+          >
+            {item}
+          </div>
+        ))}
+      </div>
+
+      {/* Image Carousel */}
       <div
         ref={containerRef}
         className="fixed inset-0 flex items-center justify-center overflow-hidden"
@@ -133,10 +158,8 @@ const Home = () => {
           ))}
         </div>
       </div>
-
-      
-    </div>
+    </motion.div>
   );
 };
 
-export default Home;
+export default Project;

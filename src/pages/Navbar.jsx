@@ -33,7 +33,7 @@ export default function Navbar() {
 
           {/* Left Links (Hidden on Mobile) */}
           <div className="hidden md:flex space-x-8">
-            <Link to="/" className="text-gray-800 hover:text-gray-600 transition-colors">
+            <Link to="/projects" className="text-gray-800 hover:text-gray-600 transition-colors">
               PROJECTS
             </Link>
             <Link to="/poster" className="text-gray-800 hover:text-gray-600 transition-colors">

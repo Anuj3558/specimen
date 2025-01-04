@@ -11,6 +11,12 @@ import PosterDetail from './pages/posterdetails';
 import { LogIn } from 'lucide-react';
 import LoginPage from './pages/Login';
 import SpecimenLoading from './pages/Loading';
+import TermsAndServicePage from './pages/tnc';
+import ContactPage from './pages/contact';
+import Footer from './pages/Footer';
+import Project from './pages/projects';
+import SignupPage from './pages/signup';
+import BagPage from './pages/bag';
 
 
 const SAMPLE_POSTERS = [
@@ -64,6 +70,14 @@ const SAMPLE_POSTERS = [
     image: '/placeholder.svg?height=600&width=450',
     dimensions: ['15×15"', '20×20"', '25×25"']
   },
+  {
+    id: '1',
+    title: '1978 PORSCHE 911 CARRERA',
+    series: 'THE CAR SERIES',
+    price: 48,
+    image: '/placeholder.svg?height=600&width=450',
+    dimensions: ['15×15"', '20×20"', '25×25"']
+  }
   // Add more sample posters here
 ]
 const IntroAnimation = ({ onComplete }) => {
@@ -157,7 +171,25 @@ const AppContent = () => {
           <Route 
             path="/Login" 
             element={<LoginPage  />} 
+          /> 
+          <Route 
+          path="/projects" 
+          element={<Project  />} 
+        />
+          <Route 
+            path="/tnc" 
+            element={<TermsAndServicePage  />} 
           />
+          <Route 
+            path="/contact" 
+            element={<ContactPage  />} 
+          /> <Route 
+          path="/signup" 
+          element={<SignupPage  />} 
+        /> <Route 
+        path="/bag" 
+        element={<BagPage  />} 
+      />
           <Route 
             path="/poster/:id" 
             element={<PosterDetail poster={SAMPLE_POSTERS[0]} />} 
@@ -174,6 +206,7 @@ function App() {
     <Router>
       <Navbar />
       <AppContent />
+      <Footer />
     </Router>
     
   );
