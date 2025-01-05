@@ -11,16 +11,18 @@ const Home = () => {
   const [isScrolling, setIsScrolling] = useState(false);
   const [touchStart, setTouchStart] = useState(null);
   const [touchEnd, setTouchEnd] = useState(null);
+  const [velocity, setVelocity] = useState(0);
   const containerRef = useRef(null);
   const audioRef = useRef(null);
   const scrollTimeout = useRef(null);
   const lastScrollTime = useRef(Date.now());
+  const lastTouchY = useRef(0);
+  const lastTouchTime = useRef(Date.now());
   const isMobile = useMediaQuery({ query: '(max-width: 768px)' });
 
   const images = Array(11).fill(Hero);
-
-  // Minimum swipe distance for touch events (in pixels)
-  const minSwipeDistance = 50;
+  const minSwipeDistance = 30; // Reduced minimum swipe distance for better responsiveness
+  const velocityFactor = 0.8; // Factor to control the impact of velocity on scrolling
 
   useEffect(() => {
     const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -47,25 +49,26 @@ const Home = () => {
     audioRef.current = createClickSound;
   }, []);
 
-  // Handle smooth scrolling and index updates
-  const handleScroll = (delta) => {
+  const handleScroll = (delta, currentVelocity = 0) => {
     const now = Date.now();
     if (now - lastScrollTime.current < 16) {
       return;
     }
     lastScrollTime.current = now;
 
-    const scrollDelta = delta * (isMobile ? 0.2 : 0.3);
+    // Adjust scroll sensitivity based on velocity
+    const velocityMultiplier = Math.min(Math.abs(currentVelocity * velocityFactor), 2);
+    const scrollDelta = delta * (isMobile ? 0.15 : 0.3) * (1 + velocityMultiplier);
     const newScrollPosition = scrollPosition + scrollDelta;
     const maxScrollPosition = (images.length - 1) * 100;
-    let clampedScrollPosition;
 
+    let clampedScrollPosition = Math.max(0, Math.min(newScrollPosition, maxScrollPosition));
+    
+    // Add elastic bounce effect at edges
     if (newScrollPosition < 0) {
-      clampedScrollPosition = Math.max(0, newScrollPosition);
+      clampedScrollPosition = Math.max(-20, newScrollPosition * 0.5);
     } else if (newScrollPosition > maxScrollPosition) {
-      clampedScrollPosition = Math.min(maxScrollPosition, newScrollPosition);
-    } else {
-      clampedScrollPosition = newScrollPosition;
+      clampedScrollPosition = Math.min(maxScrollPosition + 20, maxScrollPosition + (newScrollPosition - maxScrollPosition) * 0.5);
     }
 
     setScrollPosition(clampedScrollPosition);
@@ -73,18 +76,21 @@ const Home = () => {
 
     clearTimeout(scrollTimeout.current);
     scrollTimeout.current = setTimeout(() => {
+      // Snap to nearest position
       const targetIndex = Math.round(clampedScrollPosition / 100);
       const newIndex = Math.max(0, Math.min(targetIndex, images.length - 1));
+      
       if (newIndex !== activeIndex) {
         setActiveIndex(newIndex);
         audioRef.current?.();
       }
+      
       setIsScrolling(false);
       setScrollPosition(targetIndex * 100);
-    }, 150);
+      setVelocity(0);
+    }, 200); // Increased timeout for smoother settling
   };
 
-  // Mouse wheel event handler
   useEffect(() => {
     const container = containerRef.current;
 
@@ -105,20 +111,35 @@ const Home = () => {
     };
   }, [scrollPosition, activeIndex, images.length]);
 
-  // Touch event handlers
   const onTouchStart = (e) => {
     setTouchEnd(null);
+    const touch = e.targetTouches[0];
     setTouchStart({
-      x: e.targetTouches[0].clientX,
-      y: e.targetTouches[0].clientY
+      x: touch.clientX,
+      y: touch.clientY
     });
+    lastTouchY.current = touch.clientY;
+    lastTouchTime.current = Date.now();
+    setVelocity(0);
   };
 
   const onTouchMove = (e) => {
+    const touch = e.targetTouches[0];
     setTouchEnd({
-      x: e.targetTouches[0].clientX,
-      y: e.targetTouches[0].clientY
+      x: touch.clientX,
+      y: touch.clientY
     });
+
+    // Calculate velocity
+    const deltaY = lastTouchY.current - touch.clientY;
+    const deltaTime = Date.now() - lastTouchTime.current;
+    if (deltaTime > 0) {
+      const newVelocity = deltaY / deltaTime;
+      setVelocity(newVelocity);
+    }
+
+    lastTouchY.current = touch.clientY;
+    lastTouchTime.current = Date.now();
   };
 
   const onTouchEnd = () => {
@@ -129,14 +150,11 @@ const Home = () => {
     const isHorizontalSwipe = Math.abs(distanceX) > Math.abs(distanceY);
 
     if (isMobile && !isHorizontalSwipe && Math.abs(distanceY) > minSwipeDistance) {
-      // Vertical swipe
-      handleScroll(distanceY * 2);
+      handleScroll(distanceY * 1.5, velocity);
     } else if (!isMobile && isHorizontalSwipe && Math.abs(distanceX) > minSwipeDistance) {
-      // Horizontal swipe for desktop
-      handleScroll(distanceX * 2);
+      handleScroll(distanceX * 1.5, velocity);
     }
 
-    // Reset touch coordinates
     setTouchStart(null);
     setTouchEnd(null);
   };
@@ -146,28 +164,30 @@ const Home = () => {
     const distance = index - centerPosition;
     const normalizedDistance = Math.abs(distance);
 
-    const scale = 1 - normalizedDistance * (isMobile ? 0.08 : 0.15);
-    const opacity = Math.max(0.2, 1 - normalizedDistance * 0.25);
-    const blur = Math.min(normalizedDistance * 3, 10);
+    const scale = 1 - normalizedDistance * (isMobile ? 0.06 : 0.15); // Reduced scale change for mobile
+    const opacity = Math.max(0.3, 1 - normalizedDistance * 0.2); // Increased minimum opacity
+    const blur = Math.min(normalizedDistance * 2, 6); // Reduced maximum blur
 
     if (isMobile) {
-      const yTranslate = distance * 35;
-      const zTranslate = -Math.abs(distance) * 40;
+      const yTranslate = distance * 30; // Reduced translation distance
+      const zTranslate = -Math.abs(distance) * 30;
 
       return {
         transform: `
           translate3d(0, ${yTranslate}%, ${zTranslate}px)
           scale(${scale})
-          rotateX(${distance * -2}deg)
+          rotateX(${distance * -1.5}deg)
         `,
         opacity,
         zIndex: 100 - Math.abs(Math.round(distance * 10)),
         filter: `blur(${blur}px)`,
-        transition: isScrolling ? 'transform 0.2s ease-out' : 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
+        transition: isScrolling 
+          ? 'transform 0.1s ease-out' 
+          : 'all 0.4s cubic-bezier(0.2, 0, 0.2, 1)',
         WebkitTransform: `
           translate3d(0, ${yTranslate}%, ${zTranslate}px)
           scale(${scale})
-          rotateX(${distance * -2}deg)
+          rotateX(${distance * -1.5}deg)
         `,
       };
     }
@@ -184,7 +204,9 @@ const Home = () => {
       opacity,
       zIndex: 100 - Math.abs(Math.round(distance * 10)),
       filter: `blur(${blur}px)`,
-      transition: isScrolling ? 'transform 0.2s ease-out' : 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
+      transition: isScrolling 
+        ? 'transform 0.1s ease-out' 
+        : 'all 0.4s cubic-bezier(0.2, 0, 0.2, 1)',
     };
   };
 
@@ -215,9 +237,9 @@ const Home = () => {
               style={getImageStyles(index)}
             >
               <div
-                className={`relative ${isMobile ? 'w-[300px]' : 'w-[400px] md:w-[500px]'} 
-                            aspect-[3/4] bg-white p-2 md:p-4 shadow-2xl
-                            ${index === activeIndex ? 'ring-2 ring-gray-900' : ''}`}
+                className={`relative ${isMobile ? 'w-[320px]' : 'w-[400px] md:w-[500px]'} 
+                          aspect-[3/4] bg-white p-2 md:p-4 shadow-2xl
+                          ${index === activeIndex ? 'ring-2 ring-gray-900' : ''}`}
               >
                 <img
                   src={image}
