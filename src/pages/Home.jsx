@@ -231,7 +231,7 @@ const Home = () => {
               key={index}
               className={`absolute ${
                 isMobile 
-                  ? 'left-1/2 -translate-x-1/2'
+                  ? 'left-[30vw] -translate-x-1/2'
                   : 'sm:left-[35vw] md:left-[35vw] top-1/2 -translate-y-1/2 -translate-x-1/2'
               }`}
               style={getImageStyles(index)}
