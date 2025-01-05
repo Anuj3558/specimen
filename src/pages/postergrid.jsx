@@ -19,7 +19,7 @@ const itemVariants = {
 
 export default function PosterGrid({ posters }) {
   return (
-    <div className="w-full bg-white mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-12">
+    <div className="w-full bg-white mx-auto  sm:px-6 lg:px-8 pt-24 pb-12">
       {/* Grid Container */}
       <motion.div
         className="grid grid-cols-1 p-16 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8"
