@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useMediaQuery } from 'react-responsive';
-import Footer from './Footer';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Hero } from '../Assets';
 
 const Home = () => {
@@ -101,6 +101,23 @@ const Home = () => {
     const opacity = Math.max(0.2, 1 - normalizedDistance * 0.25);
     const blur = Math.min(normalizedDistance * 3, 10);
 
+    if (isMobile) {
+      const yTranslate = distance * 35;
+      const zTranslate = -Math.abs(distance) * 40;
+
+      return {
+        transform: `
+          translate3d(0, ${yTranslate}%, ${zTranslate}px)
+          scale(${scale})
+          rotateX(${distance * -2}deg)
+        `,
+        opacity,
+        zIndex: 100 - Math.abs(Math.round(distance * 10)),
+        filter: `blur(${blur}px)`,
+        transition: isScrolling ? 'transform 0.2s ease-out' : 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
+      };
+    }
+
     const xTranslate = distance * 45;
     const zTranslate = -Math.abs(distance) * 100;
 
@@ -110,7 +127,7 @@ const Home = () => {
         scale(${scale})
         rotateY(${distance * 5}deg)
       `,
-      opacity: opacity,
+      opacity,
       zIndex: 100 - Math.abs(Math.round(distance * 10)),
       filter: `blur(${blur}px)`,
       transition: isScrolling ? 'transform 0.2s ease-out' : 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -118,7 +135,12 @@ const Home = () => {
   };
 
   return (
-    <div className="relative min-h-screen bg-gray-100 mx-auto overflow-hidden">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 1, ease: 'easeInOut' }}
+      className="relative min-h-screen bg-gray-100 mx-auto overflow-hidden"
+    >
       <div
         ref={containerRef}
         className="fixed inset-0 flex items-center justify-center overflow-hidden"
@@ -128,11 +150,15 @@ const Home = () => {
           {images.map((image, index) => (
             <div
               key={index}
-              className="absolute sm:left-[35vw] md:left-[35vw] top-1/2 transform -translate-x-1/2 -translate-y-1/2"
+              className={`absolute ${
+                isMobile 
+                  ? 'left-[30vw] -translate-x-1/2'
+                  : 'sm:left-[35vw] md:left-[35vw] top-1/2 -translate-y-1/2 -translate-x-1/2'
+              }`}
               style={getImageStyles(index)}
             >
               <div
-                className={`relative ${isMobile ? 'w-[200px]' : 'w-[400px] md:w-[500px]'} 
+                className={`relative ${isMobile ? 'w-[300px]' : 'w-[400px] md:w-[500px]'} 
                             aspect-[3/4] bg-white p-2 md:p-4 shadow-2xl
                             ${index === activeIndex ? 'ring-2 ring-gray-900' : ''}`}
               >
@@ -150,7 +176,7 @@ const Home = () => {
           ))}
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 
