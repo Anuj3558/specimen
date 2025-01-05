@@ -1,61 +1,87 @@
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import { Hero } from '../Assets';
 
-export default function BagPage() {
-  // Sample bag items (replace with actual data)
+const BagPage = () => {
   const bagItems = [
     {
       id: 1,
-      title: 'PORSCHE 911 CARRERA',
-      series: 'SPECIMEN15',
+      title: 'SPECIMEN15',
+      subtitle: 'FRAMED POSTER',
       price: 45,
-      image: '/placeholder.svg?height=600&width=800',
-      description: 'FINANCIOLOGIES ARULABLEMOM ESDOKE GOVEF',
+      image: Hero,
+      status: 'AVAILABLE NOW',
+      size: '50X15'
     },
     {
       id: 2,
-      title: 'PORSCHE 911 CARRERA',
-      series: 'SPECIMEN15',
+      title: 'SPECIMEN15',
+      subtitle: 'FRAMED POSTER',
       price: 45,
-      image: '/placeholder.svg?height=600&width=800',
-      description: 'FINANCIOLOGIES ARULABLEMOM ESDOKE GOVEF',
+      image: Hero,
+      status: 'AVAILABLE NOW',
+      size: '50X15'
     },
     {
       id: 3,
-      title: 'PORSCHE 911 CARRERA',
-      series: 'SPECIMEN15',
+      title: 'SPECIMEN15',
+      subtitle: 'FRAMED POSTER',
       price: 45,
-      image: '/placeholder.svg?height=600&width=800',
-      description: 'FINANCIOLOGIES ARULABLEMOM ESDOKE GOVEF',
-    },
+      image: Hero,
+      status: 'AVAILABLE NOW',
+      size: '50X15'
+    }
   ];
 
-  // Calculate subtotal
-  const subtotal = bagItems.reduce((total, item) => total + item.price, 0);
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+        delayChildren: 0.2
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.5,
+        ease: "easeOut"
+      }
+    }
+  };
+
+  const subtotal = bagItems.reduce((sum, item) => sum + item.price, 0);
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.5, ease: 'easeInOut' }}
-      className="min-h-screen bg-gray-50 p-36"
-    >
-      <div className="max-w-7xl mx-auto">
-        {/* Page Title */}
-        <h1 className="text-2xl font-bold mb-8">YOUR BAG</h1>
+    <div className="min-h-screen bg-gray-50/50  px-6 py-12 md:px-12 lg:px-24">
+      <div className="max-w-7xl p-14 mx-auto">
+        <motion.h1 
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-xl mb-16"
+        >
+          YOUR BAG
+        </motion.h1>
 
-        {/* Bag Items */}
-        <div className="space-y-8">
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="space-y-8"
+        >
           {bagItems.map((item, index) => (
             <motion.div
               key={item.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1, duration: 0.5 }}
-              className="flex flex-col md:flex-row items-center gap-6 border-b border-gray-200 pb-8"
+              variants={itemVariants}
+              className="grid grid-cols-1 md:grid-cols-[100px_1fr_120px] lg:grid-cols-[150px_1fr_120px] gap-8 items-start border-t border-gray-200 pt-8"
             >
-              {/* Item Image */}
-              <div className="w-32 h-32 md:w-48 md:h-48 bg-gray-200 flex items-center justify-center">
+              <div className="aspect-[3/4] bg-gray-100">
                 <img
                   src={item.image}
                   alt={item.title}
@@ -63,41 +89,55 @@ export default function BagPage() {
                 />
               </div>
 
-              {/* Item Details */}
-              <div className="flex-1">
-                <h2 className="text-lg font-bold">{item.title}</h2>
-                <p className="text-sm text-gray-600">{item.series}</p>
-                <p className="text-sm text-gray-600 mt-2">{item.description}</p>
-                <p className="text-lg font-bold mt-4">${item.price}</p>
+              <div className="space-y-1">
+                <div className="flex justify-between md:justify-start md:space-x-8">
+                  <p>{item.title}</p>
+                  <p className="md:hidden">${item.price}</p>
+                </div>
+                <p className="text-sm text-gray-600">{item.subtitle}</p>
+                <p className="text-sm text-gray-600 mt-4">{item.status}</p>
+                <p className="text-sm text-gray-600">{item.size}</p>
+                <button className="text-sm underline mt-4">
+                  REMOVE
+                </button>
               </div>
+
+              <p className="hidden md:block text-right">
+                ${item.price}
+              </p>
             </motion.div>
           ))}
-        </div>
+        </motion.div>
 
-        {/* Subtotal and Actions */}
-        <div className="mt-8 border-t border-gray-200 pt-8">
-          <div className="flex justify-between items-center">
-            <p className="text-lg font-bold">SUBTOTAL:</p>
-            <p className="text-lg font-bold">${subtotal}</p>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          className="mt-16 border-t border-gray-200 pt-8"
+        >
+          <div className="flex justify-between mb-8">
+            <p>SUBTOTAL</p>
+            <p>${subtotal}</p>
           </div>
 
-          {/* Buttons */}
-          <div className="mt-8 flex flex-col md:flex-row gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Link
               to="/checkout"
-              className="w-full md:w-auto bg-black text-white py-3 px-8 text-center rounded-lg hover:bg-gray-800 transition-colors"
+              className="bg-black text-white py-3 px-6 text-center hover:bg-gray-900 transition-colors"
             >
               CHECKOUT
             </Link>
             <Link
               to="/"
-              className="w-full md:w-auto border border-black py-3 px-8 text-center rounded-lg hover:bg-gray-100 transition-colors"
+              className="border border-black py-3 px-6 text-center hover:bg-gray-50 transition-colors"
             >
               CONTINUE SHOPPING
             </Link>
           </div>
-        </div>
+        </motion.div>
       </div>
-    </motion.div>
+    </div>
   );
-}
+};
+
+export default BagPage;

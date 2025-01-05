@@ -1,23 +1,41 @@
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
-import { FaBars, FaTimes } from 'react-icons/fa'; // Import icons for the hamburger menu
+import { motion, AnimatePresence } from 'framer-motion';
+import { FaBars, FaTimes } from 'react-icons/fa';
+import { Hero } from '../Assets';
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isBagHovered, setIsBagHovered] = useState(false); // State for bag hover
+  const [isBagHovered, setIsBagHovered] = useState(false);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
 
-  // Sample bag items (replace with actual data)
   const bagItems = [
-    { id: 1, title: '1978 PORSCHE 911 CARRERA', price: 45 },
-    { id: 2, title: '1978 PORSCHE 911 CARRERA', price: 45 },
-    { id: 3, title: '1978 PORSCHE 911 CARRERA', price: 45 },
+    { 
+      id: 1, 
+      title: 'SPECIMEN№15',
+      subtitle: '1978 PORSCHE 911 CARRERA',
+      price: 45,
+      image: Hero
+    },
+    { 
+      id: 2, 
+      title: 'SPECIMEN№15',
+      subtitle: '1978 PORSCHE 911 CARRERA',
+      price: 45,
+      image: Hero
+    },
+    { 
+      id: 3, 
+      title: 'SPECIMEN№15',
+      subtitle: '1978 PORSCHE 911 CARRERA',
+      price: 45,
+      image: Hero
+    },
   ];
 
-  // Calculate subtotal
   const subtotal = bagItems.reduce((total, item) => total + item.price, 0);
 
   return (
@@ -31,7 +49,7 @@ export default function Navbar() {
             </button>
           </div>
 
-          {/* Left Links (Hidden on Mobile) */}
+          {/* Left Links */}
           <div className="hidden md:flex space-x-8">
             <Link to="/projects" className="text-gray-800 hover:text-gray-600 transition-colors">
               PROJECTS
@@ -46,12 +64,11 @@ export default function Navbar() {
 
           {/* Centered Logo */}
           <Link to="/" className="absolute left-1/2 -translate-x-1/2">
-            <h1 className="text-xl font-light tracking-wider">SPECIMEN.</h1>
+            <h1 className="text-xl font-light tracking-wider">SPECIMEN</h1>
           </Link>
 
-          {/* Right Links (Hidden on Mobile) */}
+          {/* Right Links */}
           <div className="hidden md:flex space-x-8">
-            {/* Bag Link with Hover Section */}
             <div
               className="relative"
               onMouseEnter={() => setIsBagHovered(true)}
@@ -61,39 +78,50 @@ export default function Navbar() {
                 BAG
               </Link>
 
-              {/* Bag Hover Section */}
-              {isBagHovered && (
-                <div className="absolute right-0 mt-2 w-80 bg-white border border-gray-200 shadow-lg rounded-lg p-4">
-                  {/* Bag Items */}
-                  <div className="space-y-4">
-                    {bagItems.map((item) => (
-                      <div key={item.id} className="flex justify-between items-center">
-                        <div>
-                          <p className="text-sm font-medium">{item.title}</p>
-                          <p className="text-xs text-gray-500">SPECIMEN15</p>
-                        </div>
-                        <p className="text-sm font-medium">${item.price}</p>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Subtotal */}
-                  <div className="border-t border-gray-200 pt-4 mt-4">
-                    <div className="flex justify-between">
-                      <p className="text-sm font-medium">SUBTOTAL:</p>
-                      <p className="text-sm font-medium">${subtotal}</p>
-                    </div>
-                  </div>
-
-                  {/* Go to Bag Button */}
-                  <Link
-                    to="/bag"
-                    className="block w-full text-center bg-black text-white py-2 mt-4 rounded-lg text-sm hover:bg-gray-800 transition-colors"
+              <AnimatePresence>
+                {isBagHovered && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
+                    transition={{ duration: 0.2 }}
+                    className="absolute right-0 mt-2 w-96 bg-white p-6 shadow-lg"
                   >
-                    GO TO BAG
-                  </Link>
-                </div>
-              )}
+                    <div className="space-y-6">
+                      {bagItems.map((item, index) => (
+                        <div key={item.id} className="flex space-x-4">
+                          <div className="w-16 h-20 bg-gray-100">
+                            <img
+                              src={item.image}
+                              alt={item.subtitle}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                          <div className="flex-1">
+                            <p className="text-sm">{item.title}</p>
+                            <p className="text-sm">{item.subtitle}</p>
+                            <p className="text-sm mt-1">${item.price}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="mt-6 pt-4 border-t border-gray-200">
+                      <div className="flex justify-between mb-4">
+                        <p className="text-sm">SUBTOTAL</p>
+                        <p className="text-sm">${subtotal}</p>
+                      </div>
+                      
+                      <Link
+                        to="/bag"
+                        className="block w-full bg-black text-white text-center py-3 text-sm"
+                      >
+                        GO TO BAG
+                      </Link>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
 
             <Link to="/search" className="text-gray-800 hover:text-gray-600 transition-colors">
@@ -102,48 +130,25 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* Mobile Menu (Collapsible) */}
-        {isMenuOpen && (
-          <div className="md:hidden bg-white backdrop-blur-sm bg-opacity-90 mt-2 py-4">
-            <div className="flex flex-col space-y-4">
-              <Link
-                to="/"
-                className="text-gray-800 hover:text-gray-600 transition-colors px-4"
-                onClick={toggleMenu}
-              >
-                PROJECTS
-              </Link>
-              <Link
-                to="/poster"
-                className="text-gray-800 hover:text-gray-600 transition-colors px-4"
-                onClick={toggleMenu}
-              >
-                INDEX VIEW
-              </Link>
-              <Link
-                to="/login"
-                className="text-gray-800 hover:text-gray-600 transition-colors px-4"
-                onClick={toggleMenu}
-              >
-                LOGIN
-              </Link>
-              <Link
-                to="/bag"
-                className="text-gray-800 hover:text-gray-600 transition-colors px-4"
-                onClick={toggleMenu}
-              >
-                BAG
-              </Link>
-              <Link
-                to="/search"
-                className="text-gray-800 hover:text-gray-600 transition-colors px-4"
-                onClick={toggleMenu}
-              >
-                SEARCH
-              </Link>
-            </div>
-          </div>
-        )}
+        {/* Mobile Menu */}
+        <AnimatePresence>
+          {isMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="md:hidden bg-white backdrop-blur-sm bg-opacity-90 mt-2 overflow-hidden"
+            >
+              <div className="flex flex-col space-y-4 py-4">
+                <Link to="/" className="px-4">PROJECTS</Link>
+                <Link to="/poster" className="px-4">INDEX VIEW</Link>
+                <Link to="/login" className="px-4">LOGIN</Link>
+                <Link to="/bag" className="px-4">BAG</Link>
+                <Link to="/search" className="px-4">SEARCH</Link>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </nav>
   );

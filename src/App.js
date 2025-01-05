@@ -17,7 +17,7 @@ import Footer from './pages/Footer';
 import Project from './pages/projects';
 import SignupPage from './pages/signup';
 import BagPage from './pages/bag';
-
+import { Hero } from './Assets';
 
 const SAMPLE_POSTERS = [
   {
@@ -25,49 +25,49 @@ const SAMPLE_POSTERS = [
     title: '1978 PORSCHE 911 CARRERA',
     series: 'THE CAR SERIES',
     price: 48,
-    image: '/placeholder.svg?height=600&width=450',
+    image: Hero,
     dimensions: ['15×15"', '20×20"', '25×25"']
   },{
     id: '1',
     title: '1978 PORSCHE 911 CARRERA',
     series: 'THE CAR SERIES',
     price: 48,
-    image: '/placeholder.svg?height=600&width=450',
+    image: Hero,
     dimensions: ['15×15"', '20×20"', '25×25"']
   },{
     id: '1',
     title: '1978 PORSCHE 911 CARRERA',
     series: 'THE CAR SERIES',
     price: 48,
-    image: '/placeholder.svg?height=600&width=450',
+    image: Hero,
     dimensions: ['15×15"', '20×20"', '25×25"']
   },{
     id: '1',
     title: '1978 PORSCHE 911 CARRERA',
     series: 'THE CAR SERIES',
     price: 48,
-    image: '/placeholder.svg?height=600&width=450',
+    image: Hero,
     dimensions: ['15×15"', '20×20"', '25×25"']
   },{
     id: '1',
     title: '1978 PORSCHE 911 CARRERA',
     series: 'THE CAR SERIES',
     price: 48,
-    image: '/placeholder.svg?height=600&width=450',
+    image: Hero,
     dimensions: ['15×15"', '20×20"', '25×25"']
   },{
     id: '1',
     title: '1978 PORSCHE 911 CARRERA',
     series: 'THE CAR SERIES',
     price: 48,
-    image: '/placeholder.svg?height=600&width=450',
+    image: Hero,
     dimensions: ['15×15"', '20×20"', '25×25"']
   },{
     id: '1',
     title: '1978 PORSCHE 911 CARRERA',
     series: 'THE CAR SERIES',
     price: 48,
-    image: '/placeholder.svg?height=600&width=450',
+    image: Hero,
     dimensions: ['15×15"', '20×20"', '25×25"']
   },
   {
@@ -75,7 +75,7 @@ const SAMPLE_POSTERS = [
     title: '1978 PORSCHE 911 CARRERA',
     series: 'THE CAR SERIES',
     price: 48,
-    image: '/placeholder.svg?height=600&width=450',
+    image: Hero,
     dimensions: ['15×15"', '20×20"', '25×25"']
   }
   // Add more sample posters here

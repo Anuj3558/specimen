@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useMediaQuery } from 'react-responsive';
 import Footer from './Footer'; // Import the Footer component
+import { Hero } from '../Assets';
 
 const Home = () => {
   const [scrollPosition, setScrollPosition] = useState(400); // Initialize to 400 for the 5th image
@@ -11,7 +12,7 @@ const Home = () => {
   const audioRef = useRef(null);
   const isMobile = useMediaQuery({ query: '(max-width: 768px)' });
 
-  const images = Array(11).fill("/placeholder.svg?height=1000&width=800");
+  const images = Array(11).fill(Hero);
 
   // Create audio context and sounds on component mount
   useEffect(() => {

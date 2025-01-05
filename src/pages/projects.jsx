@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useMediaQuery } from 'react-responsive';
 import { motion, AnimatePresence } from 'framer-motion'; // Import framer-motion
+import { Hero } from '../Assets';
 
 const Project = () => {
   const [scrollPosition, setScrollPosition] = useState(400); // Initialize to 400 for the 5th image
@@ -11,7 +12,7 @@ const Project = () => {
   const audioRef = useRef(null);
   const isMobile = useMediaQuery({ query: '(max-width: 768px)' });
 
-  const images = Array(11).fill("/placeholder.svg?height=1000&width=800");
+  const images = Array(11).fill(Hero);
   const sideNavItems = [
     "THE CAR SERIES_23",
     "MOVIE SERIES",
