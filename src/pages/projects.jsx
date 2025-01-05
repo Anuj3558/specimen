@@ -24,6 +24,7 @@ const Project = () => {
     "NEW IN"
   ];
 
+  // Audio setup remains the same
   useEffect(() => {
     const AudioContext = window.AudioContext || window.webkitAudioContext;
     const audioContext = new AudioContext();
@@ -49,6 +50,7 @@ const Project = () => {
     audioRef.current = createClickSound;
   }, []);
 
+  // Scroll handling remains similar but with adjusted values for mobile
   useEffect(() => {
     const container = containerRef.current;
 
@@ -61,7 +63,7 @@ const Project = () => {
       }
       lastScrollTime.current = now;
 
-      const scrollDelta = e.deltaY * 0.3;
+      const scrollDelta = e.deltaY * (isMobile ? 0.2 : 0.3); // Reduced sensitivity on mobile
       const newScrollPosition = scrollPosition + scrollDelta;
       const maxScrollPosition = (images.length - 1) * 100;
       let clampedScrollPosition;
@@ -100,17 +102,37 @@ const Project = () => {
       }
       clearTimeout(scrollTimeout.current);
     };
-  }, [scrollPosition, activeIndex, images.length]);
+  }, [scrollPosition, activeIndex, images.length, isMobile]);
 
   const getImageStyles = (index) => {
     const centerPosition = scrollPosition / 100;
     const distance = index - centerPosition;
     const normalizedDistance = Math.abs(distance);
 
-    const scale = 1 - normalizedDistance * 0.15;
-    const opacity = Math.max(0.2, 1 - normalizedDistance * 0.25);
-    const blur = Math.min(normalizedDistance * 3, 10);
+    // Adjusted scale and opacity for better mobile visibility
+    const scale = 1 - normalizedDistance * (isMobile ? 0.08 : 0.15);
+    const opacity = Math.max(0.3, 1 - normalizedDistance * 0.2);
+    const blur = Math.min(normalizedDistance * 2, 8);
 
+    if (isMobile) {
+      // Adjusted vertical spacing and perspective for mobile
+      const yTranslate = distance * 35; // Reduced from 45 for tighter stacking
+      const zTranslate = -Math.abs(distance) * 40; // Reduced for less aggressive depth
+
+      return {
+        transform: `
+          translate3d(0, ${yTranslate}%, ${zTranslate}px)
+          scale(${scale})
+          rotateX(${distance * -2}deg)
+        `,
+        opacity,
+        zIndex: 100 - Math.abs(Math.round(distance * 10)),
+        filter: `blur(${blur}px)`,
+        transition: isScrolling ? 'transform 0.2s ease-out' : 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
+      };
+    }
+
+    // Desktop styles remain the same
     const xTranslate = distance * 45;
     const zTranslate = -Math.abs(distance) * 100;
 
@@ -120,7 +142,7 @@ const Project = () => {
         scale(${scale})
         rotateY(${distance * 5}deg)
       `,
-      opacity: opacity,
+      opacity,
       zIndex: 100 - Math.abs(Math.round(distance * 10)),
       filter: `blur(${blur}px)`,
       transition: isScrolling ? 'transform 0.2s ease-out' : 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -134,12 +156,13 @@ const Project = () => {
       transition={{ duration: 1, ease: 'easeInOut' }}
       className="relative min-h-screen bg-gray-100 mx-auto overflow-hidden"
     >
-      <div className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 z-40">
+      {/* Adjusted navigation positioning for mobile */}
+      <div className={`fixed ${isMobile ? 'top-[40vh] left-[3vw] z-50 justify-center text-center' : 'left-8 top-1/2 -translate-y-1/2 z-40'}`}>
         {sideNavItems.map((item, index) => (
           <div
             key={index}
             className={`text-xs md:text-sm ${activeIndex === index ? 'text-gray-900 font-medium' : 'text-gray-600'} 
-                       mb-2 md:mb-4 transition-colors duration-300`}
+                       mb-2 md:mb-4 transition-colors duration-300 ${isMobile ? 'text-right' : ''}`}
           >
             {item}
           </div>
@@ -155,11 +178,15 @@ const Project = () => {
           {images.map((image, index) => (
             <div
               key={index}
-              className="absolute sm:left-[35vw] md:left-[35vw] top-1/2 transform -translate-x-1/2 -translate-y-1/2"
+              className={`absolute ${
+                isMobile 
+                  ? 'left-[30vw] -translate-x-1/2' // Centered horizontally on mobile
+                  : 'sm:left-[35vw] md:left-[35vw] top-1/2 -translate-y-1/2 -translate-x-1/2'
+              }`}
               style={getImageStyles(index)}
             >
               <div
-                className={`relative ${isMobile ? 'w-[200px]' : 'w-[400px] md:w-[500px]'} 
+                className={`relative ${isMobile ? 'w-[300px]' : 'w-[400px] md:w-[500px]'} 
                             aspect-[3/4] bg-white p-2 md:p-4 shadow-2xl
                             ${index === activeIndex ? 'ring-2 ring-gray-900' : ''}`}
               >
