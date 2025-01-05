@@ -2,14 +2,17 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useMediaQuery } from 'react-responsive';
-import { motion, AnimatePresence } from 'framer-motion'; // Import framer-motion
+import { motion, AnimatePresence } from 'framer-motion';
 import { Hero } from '../Assets';
 
 const Project = () => {
-  const [scrollPosition, setScrollPosition] = useState(400); // Initialize to 400 for the 5th image
-  const [activeIndex, setActiveIndex] = useState(4); // Initialize to 4 for the 5th image
+  const [scrollPosition, setScrollPosition] = useState(400);
+  const [activeIndex, setActiveIndex] = useState(4);
+  const [isScrolling, setIsScrolling] = useState(false);
   const containerRef = useRef(null);
   const audioRef = useRef(null);
+  const scrollTimeout = useRef(null);
+  const lastScrollTime = useRef(Date.now());
   const isMobile = useMediaQuery({ query: '(max-width: 768px)' });
 
   const images = Array(11).fill(Hero);
@@ -21,7 +24,6 @@ const Project = () => {
     "NEW IN"
   ];
 
-  // Create audio context and sounds on component mount
   useEffect(() => {
     const AudioContext = window.AudioContext || window.webkitAudioContext;
     const audioContext = new AudioContext();
@@ -53,22 +55,39 @@ const Project = () => {
     const handleScroll = (e) => {
       e.preventDefault();
 
-      // Calculate the new scroll position
-      const scrollDelta = e.deltaY;
-      const newScrollPosition = scrollPosition + scrollDelta * 0.3;
+      const now = Date.now();
+      if (now - lastScrollTime.current < 16) {
+        return;
+      }
+      lastScrollTime.current = now;
 
-      // Clamp the scroll position between 0 and the maximum scrollable area
+      const scrollDelta = e.deltaY * 0.3;
+      const newScrollPosition = scrollPosition + scrollDelta;
       const maxScrollPosition = (images.length - 1) * 100;
-      const clampedScrollPosition = Math.max(0, Math.min(newScrollPosition, maxScrollPosition));
+      let clampedScrollPosition;
+
+      if (newScrollPosition < 0) {
+        clampedScrollPosition = Math.max(0, newScrollPosition);
+      } else if (newScrollPosition > maxScrollPosition) {
+        clampedScrollPosition = Math.min(maxScrollPosition, newScrollPosition);
+      } else {
+        clampedScrollPosition = newScrollPosition;
+      }
 
       setScrollPosition(clampedScrollPosition);
+      setIsScrolling(true);
 
-      // Update the active index based on the scroll position
-      const newIndex = Math.round(clampedScrollPosition / 100);
-      if (newIndex !== activeIndex) {
-        setActiveIndex(newIndex);
-        audioRef.current?.(); // Play the click sound
-      }
+      clearTimeout(scrollTimeout.current);
+      scrollTimeout.current = setTimeout(() => {
+        const targetIndex = Math.round(clampedScrollPosition / 100);
+        const newIndex = Math.max(0, Math.min(targetIndex, images.length - 1));
+        if (newIndex !== activeIndex) {
+          setActiveIndex(newIndex);
+          audioRef.current?.();
+        }
+        setIsScrolling(false);
+        setScrollPosition(targetIndex * 100);
+      }, 150);
     };
 
     if (container) {
@@ -79,6 +98,7 @@ const Project = () => {
       if (container) {
         container.removeEventListener('wheel', handleScroll);
       }
+      clearTimeout(scrollTimeout.current);
     };
   }, [scrollPosition, activeIndex, images.length]);
 
@@ -103,18 +123,17 @@ const Project = () => {
       opacity: opacity,
       zIndex: 100 - Math.abs(Math.round(distance * 10)),
       filter: `blur(${blur}px)`,
-      transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
+      transition: isScrolling ? 'transform 0.2s ease-out' : 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
     };
   };
 
   return (
     <motion.div
-      initial={{ opacity: 0 }} // Initial state (hidden)
-      animate={{ opacity: 1 }} // Animate to fully visible
-      transition={{ duration: 1, ease: 'easeInOut' }} // Smooth transition
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 1, ease: 'easeInOut' }}
       className="relative min-h-screen bg-gray-100 mx-auto overflow-hidden"
     >
-      {/* Main Content */}
       <div className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 z-40">
         {sideNavItems.map((item, index) => (
           <div
@@ -127,11 +146,10 @@ const Project = () => {
         ))}
       </div>
 
-      {/* Image Carousel */}
       <div
         ref={containerRef}
         className="fixed inset-0 flex items-center justify-center overflow-hidden"
-        style={{ height: '100vh' }} // Ensure the container has a height
+        style={{ height: '100vh' }}
       >
         <div className="relative w-full h-full max-w-[2000px] mx-auto flex items-center justify-center">
           {images.map((image, index) => (
